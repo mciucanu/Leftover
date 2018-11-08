@@ -59,6 +59,15 @@ class AddItem extends React.Component {
           format="MM-DD-YYYY"
           placeholder="Expiry Date"
           showIcon={false}
+          customStyles={{
+            dateInput: {
+              borderTopWidth:0,
+              borderLeftWidth:0,
+              borderRightWidth:0,
+              paddingRight:125,
+              borderBottomColor:'#0B0B0B'
+            }
+          }}
         />
         <TouchableOpacity
           style={styles.addButton}

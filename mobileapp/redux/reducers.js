@@ -1,8 +1,13 @@
 const initialStates = {
-  page:1,
+  page:0,
+  ipage:0,
   title:"My Items",
   name:"",
-  date:""
+  date:"",
+  email:"",
+  username:"",
+  password:"",
+  rpassword:""
 }
 
 export function ReducerFunc(state=initialStates, action){
@@ -13,7 +18,10 @@ export function ReducerFunc(state=initialStates, action){
     
     case "CHANGE_PAGE":
       obj.page = action.page;
-      obj.title = action.title;
+      return obj;
+      
+    case "CHANGE_IPAGE":
+      obj.ipage = action.ipage;
       return obj;
       
     case "CHANGE_NAME":
@@ -22,6 +30,22 @@ export function ReducerFunc(state=initialStates, action){
       
     case "CHANGE_DATE":
       obj.date = action.date;
+      return obj;
+      
+    case "CHANGE_EMAIL":
+      obj.email = action.email;
+      return obj;
+      
+    case "CHANGE_USERNAME":
+      obj.username = action.username;
+      return obj;
+      
+    case "CHANGE_PASSWORD":
+      obj.password = action.password;
+      return obj;
+      
+    case "CHANGE_RPASSWORD":
+      obj.rpassword = action.rpassword;
       return obj;
     
     default:

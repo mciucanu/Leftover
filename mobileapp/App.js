@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, TouchableHighlight, Image } from 'react-native';
 
-import Main from "./pages/Main";
+import MyApp from "./pages/MyApp";
 
 import Thunk from "redux-thunk";
 import {Provider} from "react-redux";
@@ -21,7 +21,7 @@ export default class App extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <Main />
+        <MyApp />
       </Provider>
     );
   }

@@ -55,7 +55,7 @@ class Main extends React.Component {
           <View style={styles.butOut}>  
             <Image
               style={styles.logo}
-              source={require('../imgs/logo.png')}
+              source={require('../imgs/logob.png')}
               resizeMode='contain'
             />
           </View>
@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    width:'100%'
   },
   
   navBar: {
