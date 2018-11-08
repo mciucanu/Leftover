@@ -1,20 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, Image, ScrollView } from 'react-native';
+import Swipeout from 'react-native-swipeout';
 
 import {connect} from "react-redux";
 
 class MyItems extends React.Component {
-  
-  date = new Date().getDate();
-  month = new Date().getMonth()+1;
-  year = new Date().getYear()+1900;
-  today = this.month + '-' + this.date + '-' + this.year;
-  exp = this.props.showDate;
-  diff = this.exp - this.today;
-  datestr = this.exp.replace(/-/g, "/")+" 00:00:00 PST";
-  expdate = new Date(this.datestr);
-  diff = this.expdate - new Date();
-  dateShowed = Math.ceil(this.diff/(1000*60*60*24));
 
   componentWillMount=()=>{
     fetch("http://localhost:8888/server_leftover/show_items.php", {
@@ -55,7 +45,18 @@ class MyItems extends React.Component {
     }
   }
   
-  /*handleShowItems=()=>{
+  handleDelete=(id)=>{
+    console.log(id);
+    var fd = new FormData();
+    fd.append("id", id);
+    
+    fetch("http://localhost:8888/server_leftover/delete_items.php", {
+      method:"POST",
+      body:fd
+    }).then((resp)=>{
+      return resp.json();
+    });
+    
     fetch("http://localhost:8888/server_leftover/show_items.php", {
       method:"POST"
     }).then((resp)=>{
@@ -67,14 +68,13 @@ class MyItems extends React.Component {
         })
       }
     });
-  }*/
+  }
   
   render() {
     
     
     var allItems = this.state.items.map((obj, i)=>{
       
-      //calculate the date
       date = new Date().getDate();
       month = new Date().getMonth()+1;
       year = new Date().getYear()+1900;
@@ -85,42 +85,54 @@ class MyItems extends React.Component {
       diff = expdate - new Date();
       dateShowed = Math.ceil(diff/(1000*60*60*24));
       
+      var swipeoutBtns = [
+        {
+          text: 'Delete',
+          backgroundColor: '#F20000',
+          onPress: this.handleDelete.bind(this, obj.item_id)  
+        }
+      ]
+      
       return (
-        <View style={styles.item} key={i}>
-          
-          {/*Item Image*/}
-          <View style={styles.imgOut}>  
-            <Image 
-              style={styles.itemImg}
-              source={require('../imgs/item1.jpg')}
-              resizeMode='contain'
-            />
-          </View>
-          
-          {/*Item Name*/}
-          <Text 
-            style={styles.name}>
-            {obj.name}
-          </Text>
-          
-          {/*Item Date*/}
-          <View style={styles.expireOut}>
-            <View style={styles.expireIn}> 
-              <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(dateShowed)}}>{dateShowed}</Text>
-              <Text style={{fontSize:16, color:this.handleColor(dateShowed)}}>{this.handleDayText(dateShowed)}</Text>
+        
+        <Swipeout 
+          right={swipeoutBtns} 
+          style={{backgroundColor:'white'}} 
+          key={i}
+          buttonWidth={100}
+          autoClose={true}
+          >
+          <View style={styles.item}>
+            
+            {/*Item Image*/}
+            <View style={styles.imgOut}>  
+              <Image 
+                style={styles.itemImg}
+                source={require('../imgs/item1.jpg')}
+                resizeMode='contain'
+              />
+            </View>
+            
+            {/*Item Name*/}
+            <Text 
+              style={styles.name}>
+              {obj.name}
+            </Text>
+            
+            {/*Item Date*/}
+            <View style={styles.expireOut}>
+              <View style={styles.expireIn}> 
+                <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(dateShowed)}}>{dateShowed}</Text>
+                <Text style={{fontSize:16, color:this.handleColor(dateShowed)}}>{this.handleDayText(dateShowed)}</Text>
+              </View>
             </View>
           </View>
-          
-        </View>
+        </Swipeout>
       )
     })
     return (
       
       <View style={styles.container}>  
-        {/*<Button 
-          title="Show All Items"
-          onPress={this.handleShowItems}
-        />*/}
         <ScrollView>
           {allItems}
         </ScrollView>
