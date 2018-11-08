@@ -16,8 +16,23 @@ class MyItems extends React.Component {
   diff = this.expdate - new Date();
   dateShowed = Math.ceil(this.diff/(1000*60*60*24));
 
+  componentWillMount=()=>{
+    fetch("http://localhost:8888/server_leftover/show_items.php", {
+      method:"POST"
+    }).then((resp)=>{
+      return resp.json();
+    }).then((json)=>{
+      if(json){
+        this.setState({
+          items:json
+        })
+      }
+    });
+  }
+  
   state = {
-    stateExp: this.dateShowed
+    stateExp: this.dateShowed,
+    items: []
   }
   
   handleColor=(val)=>{
@@ -40,15 +55,38 @@ class MyItems extends React.Component {
     }
   }
   
-  
+  /*handleShowItems=()=>{
+    fetch("http://localhost:8888/server_leftover/show_items.php", {
+      method:"POST"
+    }).then((resp)=>{
+      return resp.json();
+    }).then((json)=>{
+      if(json){
+        this.setState({
+          items:json
+        })
+      }
+    });
+  }*/
   
   render() {
     
-    return (
-      <View style={styles.container}>
-        
-        {/*ITEM 1*/}
-        <View style={styles.item}>
+    
+    var allItems = this.state.items.map((obj, i)=>{
+      
+      //calculate the date
+      date = new Date().getDate();
+      month = new Date().getMonth()+1;
+      year = new Date().getYear()+1900;
+      today = month + '-' + date + '-' + year;
+      exp = obj.expiry_date;
+      datestr = exp.replace(/-/g, "/")+" 00:00:00 PST";
+      expdate = new Date(datestr);
+      diff = expdate - new Date();
+      dateShowed = Math.ceil(diff/(1000*60*60*24));
+      
+      return (
+        <View style={styles.item} key={i}>
           
           {/*Item Image*/}
           <View style={styles.imgOut}>  
@@ -62,20 +100,30 @@ class MyItems extends React.Component {
           {/*Item Name*/}
           <Text 
             style={styles.name}>
-            {this.props.showName}
+            {obj.name}
           </Text>
           
           {/*Item Date*/}
           <View style={styles.expireOut}>
             <View style={styles.expireIn}> 
-              <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(this.dateShowed)}}>{this.dateShowed}</Text>
-              <Text style={{fontSize:16, color:this.handleColor(this.dateShowed)}}>{this.handleDayText(this.dateShowed)}</Text>
+              <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(dateShowed)}}>{dateShowed}</Text>
+              <Text style={{fontSize:16, color:this.handleColor(dateShowed)}}>{this.handleDayText(dateShowed)}</Text>
             </View>
           </View>
           
         </View>
+      )
+    })
+    return (
       
-      
+      <View style={styles.container}>  
+        {/*<Button 
+          title="Show All Items"
+          onPress={this.handleShowItems}
+        />*/}
+        <ScrollView>
+          {allItems}
+        </ScrollView>
       </View>
     );
   }
