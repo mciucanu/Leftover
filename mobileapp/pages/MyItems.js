@@ -70,6 +70,19 @@ class MyItems extends React.Component {
     });
   }
   
+  handleExpired=(dateShowed)=>{
+    if(dateShowed == 0){
+      <Text style={{fontSize:16, color:this.handleColor(dateShowed)}}>EXPIRED</Text>
+    } else {
+      return (
+        <View style={{alignItems:'center'}}>
+          <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(dateShowed)}}>{dateShowed}</Text>
+          <Text style={{fontSize:16, color:this.handleColor(dateShowed)}}>{this.handleDayText(dateShowed)}</Text>
+        </View>
+      )
+    }
+  }
+  
   render() {
     
     
@@ -121,9 +134,8 @@ class MyItems extends React.Component {
             
             {/*Item Date*/}
             <View style={styles.expireOut}>
-              <View style={styles.expireIn}> 
-                <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(dateShowed)}}>{dateShowed}</Text>
-                <Text style={{fontSize:16, color:this.handleColor(dateShowed)}}>{this.handleDayText(dateShowed)}</Text>
+              <View style={styles.expireIn}>
+                {this.handleExpired(dateShowed)}
               </View>
             </View>
           </View>
