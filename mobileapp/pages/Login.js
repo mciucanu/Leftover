@@ -35,7 +35,6 @@ class Login extends React.Component {
         return resp.json();
       }).then((json)=>{
         if(json){
-        alert(json);
         this.props.dispatch(ChangePage(1));
         } else {
           alert("Incorrect username/password, please try again")

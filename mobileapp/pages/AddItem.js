@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     width:200,
     height:50,
     borderRadius:25,
-    backgroundColor:'#9DCAA0',
+    backgroundColor:'#B8E0CE',
   },
   
   addText: {
