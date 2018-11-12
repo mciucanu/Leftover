@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, Image, ScrollView, TouchableOpacity } from 'react-native';
-import Swipeout from 'react-native-swipeout';
 
 import {connect} from "react-redux";
 
