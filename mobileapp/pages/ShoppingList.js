@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, ScrollView, TouchableOpacity } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 
 import {connect} from "react-redux";
@@ -21,13 +21,36 @@ class ShoppingList extends React.Component {
   }
   
   state = {
-    stateExp: this.dateShowed,
     items: []
+  }
+
+  handleDelete=(id)=>{
+    console.log(id);
+    var fd = new FormData();
+    fd.append("id", id);
+    
+    fetch("http://localhost:8888/server_leftover/delete_shopping_list.php", {
+      method:"POST",
+      body:fd
+    }).then((resp)=>{
+      return resp.json();
+    });
+    
+    fetch("http://localhost:8888/server_leftover/show_shopping_list.php", {
+      method:"POST"
+    }).then((resp)=>{
+      return resp.json();
+    }).then((json)=>{
+      if(json){
+        this.setState({
+          items:json
+        })
+      }
+    });
   }
   
   render() {
-    
-    
+     
     var allItems = this.state.items.map((obj, i)=>{
       
       return (
@@ -49,16 +72,38 @@ class ShoppingList extends React.Component {
             {obj.name}
           </Text>
           
+          {/*Add Button*/}
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={this.handleAdd}>
+            <Text style={styles.butText}>Bought</Text>
+          </TouchableOpacity>
+          
+          
+          {/*Delete Button*/}
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={this.handleDelete.bind(this, obj.slitem_id)}>
+            <Text style={styles.butText}>Delete</Text>
+          </TouchableOpacity>
+          
         </View>
       )
     })
     return (
       
-      <View style={styles.container}>  
-        <ScrollView>
+      <ScrollView>
+        <View style={styles.container}>  
           {allItems}
-        </ScrollView>
-      </View>
+          <View style={styles.addItem}>
+            <TouchableOpacity
+              style={styles.addItemBut}
+              onPress={this.handleAddItem}>
+              <Text style={styles.addButText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     );
   }
 }
@@ -68,12 +113,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     width:'100%',
-    flexDirection:'column'
+    flexDirection:'row',
+    alignItems:'flex-start',
+    flexWrap:'wrap'
   },
   
   item: {
     width:'50%',
-    height:200,
+    height:290,
+    alignItems:'center',
+    justifyContent:'center',
+    flexDirection:'column',
+    borderBottomColor:'lightgrey',
+    borderBottomWidth:1,
+    borderRightColor:'lightgrey',
+    borderRightWidth:1,
+    paddingBottom:30
+  },
+  
+  addItem: {
+    width:'50%',
+    height:290,
     alignItems:'center',
     justifyContent:'center',
     flexDirection:'column',
@@ -81,6 +141,15 @@ const styles = StyleSheet.create({
     borderBottomWidth:1,
     borderRightColor:'lightgrey',
     borderRightWidth:1
+  },
+  
+  addItemBut: {
+    alignItems:'center',
+    justifyContent:'center',
+    width:60,
+    height:60,
+    borderRadius:30,
+    backgroundColor:'#B8E0CE'
   },
   
   name: {
@@ -102,6 +171,36 @@ const styles = StyleSheet.create({
     flex:1,
     borderRadius:45
   },
+  
+  addButton: {
+    alignItems:'center',
+    justifyContent:'center',
+    width:100,
+    height:40,
+    borderRadius:25,
+    backgroundColor:'#B8E0CE',
+    marginBottom:10
+  },
+  
+  deleteButton: {
+    alignItems:'center',
+    justifyContent:'center',
+    width:100,
+    height:40,
+    borderRadius:25,
+    backgroundColor:'#F20000',
+  },
+  
+  butText: {
+    fontFamily: 'Helvetica',
+    color:'#FFFFFF'
+  },
+  
+  addButText: {
+    fontFamily: 'Helvetica',
+    color:'#FFFFFF',
+    fontSize:26
+  }
   
 });
 
