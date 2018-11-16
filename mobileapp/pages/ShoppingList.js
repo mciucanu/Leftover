@@ -1,10 +1,24 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
+import DatePicker from 'react-native-datepicker';
+
+import {UpdateExpiry} from '../redux/actions';
+import {UpdateSLName} from '../redux/actions';
 
 import {connect} from "react-redux";
 
 class ShoppingList extends React.Component {
 
+  date = new Date().getDate();
+  month = new Date().getMonth()+1;
+  year = new Date().getYear()+1900;
+  today = this.month + '-' + this.date + '-' + this.year;
+  exp = this.props.showDate;
+  datestr = exp.replace(/-/g, "/")+" 00:00:00 PST";
+  expdate = new Date(datestr);
+  diff = expdate - new Date();
+  dateShowed = Math.ceil(diff/(1000*60*60*24));
+  
   componentWillMount=()=>{
     fetch("http://localhost:8888/server_leftover/show_shopping_list.php", {
       method:"POST"
@@ -20,7 +34,12 @@ class ShoppingList extends React.Component {
   }
   
   state = {
-    items: []
+    items: [],
+    modal: false,
+    modal2: false,
+    idPicked: null,
+    namePicked: null,
+    myDate: null,
   }
 
   handleDelete=(id)=>{
@@ -33,19 +52,143 @@ class ShoppingList extends React.Component {
       body:fd
     }).then((resp)=>{
       return resp.json();
+    }).then((json)=>{
+      if(json){
+        fetch("http://localhost:8888/server_leftover/show_shopping_list.php", {
+          method:"POST"
+        }).then((resp)=>{
+          return resp.json();
+        }).then((json)=>{
+          if(json){
+            this.setState({
+              items:json
+            })
+          }
+        });
+      }
     });
+  }
+  
+  handleAdd=(id, name)=>{
+    this.setState({
+      modal:true,
+      idPicked:id,
+      namePicked:name
+    })
+  }
+  
+  handleUpdate=()=>{
+    var fd0 = new FormData();
+    fd0.append("item_id", this.state.idPicked);
     
-    fetch("http://localhost:8888/server_leftover/show_shopping_list.php", {
-      method:"POST"
+    fetch("http://localhost:8888/server_leftover/check_item.php", {
+      method:"POST",
+      body:fd0
+    }).then((resp)=>{
+      return resp.json();
+    }).then((json)=>{
+      console.log(json);
+      if(json==true){
+        
+        var fd = new FormData();
+        fd.append("item_id", this.state.idPicked);
+        fd.append("exp_date", this.props.showNewExp);
+        
+        fetch("http://localhost:8888/server_leftover/update_expiry_date.php", {
+          method:"POST",
+          body:fd
+        }).then((resp)=>{
+          return resp.json();
+        }).then((json)=>{
+          if(json){
+            this.setState({
+              modal:false
+            }) 
+          }
+        }
+      )}
+      
+      if(json==false){
+        
+        var fd2 = new FormData();
+        fd2.append("name", this.state.namePicked);
+        fd2.append("expiry_date", this.props.showNewExp);
+        fd2.append("added_date", this.today);
+        fd2.append("days_left", this.dateShowed);
+        
+        fetch("http://localhost:8888/server_leftover/insert_item.php", {
+          method:"POST",
+          body:fd2
+        }).then((resp)=>{
+          return resp.json();
+        }).then((json)=>{
+          if(json){
+            this.setState({
+              modal:false
+            })
+          }
+        })
+        
+      }
+    });
+  }
+  
+  handleDate=(val)=>{
+    this.setState({
+      myDate:val,
+    })
+    this.props.dispatch(UpdateExpiry(val))
+  }
+  
+  handleClose=()=>{
+    this.setState({
+      modal:false
+    })
+  }
+  
+  handleClose2=()=>{
+    this.setState({
+      modal2:false
+    })
+  }
+  
+  handleAddItem=()=>{
+    this.setState({
+      modal2:true
+    })
+  }
+  
+  handleName=(name)=>{
+    this.props.dispatch(UpdateSLName(name))
+  }
+  
+  handleAddSL=()=>{
+    var fd3 = new FormData();
+    fd3.append("name", this.props.showSLName);
+        
+    fetch("http://localhost:8888/server_leftover/insert_slitem.php", {
+      method:"POST",
+      body:fd3
     }).then((resp)=>{
       return resp.json();
     }).then((json)=>{
       if(json){
         this.setState({
-          items:json
+          modal2:false
         })
       }
-    });
+      fetch("http://localhost:8888/server_leftover/show_shopping_list.php", {
+          method:"POST"
+        }).then((resp)=>{
+          return resp.json();
+        }).then((json)=>{
+          if(json){
+            this.setState({
+              items:json
+            })
+          }
+        });
+    });  
   }
   
   render() {
@@ -74,7 +217,8 @@ class ShoppingList extends React.Component {
           {/*Add Button*/}
           <TouchableOpacity
             style={styles.addButton}
-            onPress={this.handleAdd}>
+            onPress={(val)=>{
+              this.handleAdd(obj.item_id, obj.name)}}>
             <Text style={styles.butText}>Bought</Text>
           </TouchableOpacity>
           
@@ -94,6 +238,8 @@ class ShoppingList extends React.Component {
       <ScrollView>
         <View style={styles.container}>  
           {allItems}
+          
+          {/*ADD SL ITEM*/}
           <View style={styles.addItem}>
             <TouchableOpacity
               style={styles.addItemBut}
@@ -101,6 +247,90 @@ class ShoppingList extends React.Component {
               <Text style={styles.addButText}>+</Text>
             </TouchableOpacity>
           </View>
+          
+          {/*BOUGHT ITEM*/}
+          <Modal
+            visible={this.state.modal}
+            transparent={true}>
+            <View style={styles.modalContainerOut}>
+              <View style={styles.modalContainerIn}>
+                
+                {/*Close Button*/}
+                <TouchableOpacity
+                  onPress={this.handleClose}
+                  style={styles.closeBut}>
+                  <Text style={{color:'lightgrey', fontSize:24, fontWeight:'bold'}}>X</Text>
+                </TouchableOpacity>
+                
+                {/*Heading*/}
+                <Text style={styles.updateDateText}>Update Expiry Date</Text>
+                
+                {/*Date Input*/}
+                <DatePicker
+                  onDateChange={(val)=>{
+                    this.handleDate(val)}}
+                  date={this.state.myDate}
+                  style={{width:200}}
+                  confirmBtnText="Save"
+                  cancelBtnText="Cancel"
+                  format="MM-DD-YYYY"
+                  placeholder="Expiry Date"
+                  showIcon={false}
+                  customStyles={{
+                    dateInput: {
+                      borderTopWidth:0,
+                      borderLeftWidth:0,
+                      borderRightWidth:0,
+                      paddingRight:125,
+                      borderBottomColor:'#0B0B0B'
+                    }
+                  }}
+                />
+                
+                {/*Update Button*/}
+                <TouchableOpacity 
+                  style={styles.updateBut}
+                  onPress={this.handleUpdate}>
+                  <Text style={styles.butText}>Update Item</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          
+          
+          <Modal
+            visible={this.state.modal2}
+            transparent={true}>
+            <View style={styles.modalContainerOut}>
+              <View style={styles.modalContainerIn}>
+                
+                {/*Close Button*/}
+                <TouchableOpacity
+                  onPress={this.handleClose2}
+                  style={styles.closeBut}>
+                  <Text style={{color:'lightgrey', fontSize:24, fontWeight:'bold'}}>X</Text>
+                </TouchableOpacity>
+                
+                {/*Heading*/}
+                <Text style={styles.updateDateText}>Add New Item</Text>
+                
+                <TextInput
+                  placeholder="Item Name"
+                  onChangeText={(val)=>{
+                    this.handleName(val)}}
+                  style={{width:200, height:35, borderBottomWidth:1, borderBottomColor:'#0B0B0B', marginBottom: 35}}>
+                </TextInput>
+                
+                {/*Add SL Item Button*/}
+                <TouchableOpacity 
+                  style={styles.updateBut}
+                  onPress={this.handleAddSL}>
+                  <Text style={styles.butText}>Add Item</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          
         </View>
       </ScrollView>
     );
@@ -199,6 +429,47 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
     color:'#FFFFFF',
     fontSize:26
+  },
+  
+  modalContainerOut: {
+    flex:1,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    width:'100%',
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  
+  modalContainerIn: {
+    backgroundColor: '#fff',
+    alignItems:'center',
+    justifyContent:'center',
+    width:300,
+    height:300,
+    borderWidth:1,
+    borderColor:'lightgrey',
+    borderRadius:40
+  },
+  
+  updateDateText: {
+    fontFamily:'Helvetica',
+    fontSize:18,
+    marginBottom:40
+  },
+  
+  updateBut: {
+    width:150,
+    height:40,
+    backgroundColor:'#B8E0CE',
+    borderRadius:20,
+    alignItems:'center',
+    justifyContent:'center',
+    marginTop:40
+  },
+  
+  closeBut: {
+    position:'absolute',
+    right:20,
+    top:20
   }
   
 });
@@ -206,7 +477,9 @@ const styles = StyleSheet.create({
 function mapStateToProps(state){
   return {
     showName: state.ReducerFunc.name,
-    showDate: state.ReducerFunc.date
+    showDate: state.ReducerFunc.date,
+    showNewExp: state.ReducerFunc.newExp,
+    showSLName: state.ReducerFunc.slname
   }}
 
 export default connect(mapStateToProps)(ShoppingList);

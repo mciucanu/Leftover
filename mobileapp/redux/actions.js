@@ -53,3 +53,17 @@ export function ChangeRPassword(rpassword){
     rpassword:rpassword
   }
 }
+
+export function UpdateExpiry(newExp){
+  return {
+    type:"UPDATE_EXPIRY",
+    newExp:newExp
+  }
+}
+
+export function UpdateSLName(slname){
+  return {
+    type:"UPDATE_SLNAME",
+    slname:slname
+  }
+}

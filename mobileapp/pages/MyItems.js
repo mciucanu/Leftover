@@ -5,7 +5,7 @@ import Swipeout from 'react-native-swipeout';
 import {connect} from "react-redux";
 
 class MyItems extends React.Component {
-
+  
   componentWillMount=()=>{
     fetch("http://localhost:8888/server_leftover/show_items.php", {
       method:"POST"
@@ -16,6 +16,12 @@ class MyItems extends React.Component {
         this.setState({
           items:json
         })
+//        var unsorted = this.state.items;
+//        var sorted = unsorted.sort("days_left");
+//        this.setState({
+//          sorted_items: sorted
+//        })
+//        console.log(this.state.sorted_items);
       }
     });
   }
@@ -23,6 +29,7 @@ class MyItems extends React.Component {
   state = {
     stateExp: this.dateShowed,
     items: [], 
+    sorted_items: [],
     slitem: [],
     slitem_id:"",
     slitem_name:"",
@@ -59,17 +66,19 @@ class MyItems extends React.Component {
       body:fd
     }).then((resp)=>{
       return resp.json();
-    });
-    
-    fetch("http://localhost:8888/server_leftover/show_items.php", {
-      method:"POST"
-    }).then((resp)=>{
-      return resp.json();
     }).then((json)=>{
       if(json){
-        this.setState({
-          items:json
-        })
+        fetch("http://localhost:8888/server_leftover/show_items.php", {
+          method:"POST"
+        }).then((resp)=>{
+          return resp.json();
+        }).then((json)=>{
+          if(json){
+            this.setState({
+              items:json
+            })
+          }
+        });
       }
     });
   }
@@ -94,22 +103,22 @@ class MyItems extends React.Component {
           slitem_image:this.state.slitem[0].image
         })
       }
-    });
     
-    var fd2 = new FormData();
-    fd2.append("item_id", this.state.slitem_id);
-    fd2.append("name", this.state.slitem_name);
-    fd2.append("image", this.state.slitem_image);
+      var fd2 = new FormData();
+      fd2.append("item_id", this.state.slitem_id);
+      fd2.append("name", this.state.slitem_name);
+      fd2.append("image", this.state.slitem_image);
     
-    fetch("http://localhost:8888/server_leftover/add_to_sl2.php", {
-      method:"POST",
-      body:fd2
-    }).then((resp)=>{
-      return resp.json();
-    }).then((json)=>{
-      if(json){
-        alert("Item Added to Shopping List");
-      }
+      fetch("http://localhost:8888/server_leftover/add_to_sl2.php", {
+        method:"POST",
+        body:fd2
+      }).then((resp)=>{
+        return resp.json();
+      }).then((json)=>{
+        if(json){
+          alert("Item Added to Shopping List");
+        }
+      });    
     });
   }
   
@@ -134,13 +143,13 @@ class MyItems extends React.Component {
     
     
     var allItems = this.state.items.map((obj, i)=>{
-      
+    
       date = new Date().getDate();
       month = new Date().getMonth()+1;
       year = new Date().getYear()+1900;
-      today = month + '-' + date + '-' + year;
-      exp = obj.expiry_date;
-      datestr = exp.replace(/-/g, "/")+" 00:00:00 PST";
+      today = this.month + '-' + this.date + '-' + this.year;
+      exp = this.props.showDate;
+      datestr = exp.replace((/-/g, "/")+" 00:00:00 PST");
       expdate = new Date(datestr);
       diff = expdate - new Date();
       dateShowed = Math.ceil(diff/(1000*60*60*24));
@@ -187,7 +196,7 @@ class MyItems extends React.Component {
             {/*Item Date*/}
             <View style={styles.expireOut}>
               <View style={styles.expireIn}>
-                {this.handleExpired(dateShowed)}
+                {this.handleExpired(obj.days_left)}
               </View>
             </View>
           </View>

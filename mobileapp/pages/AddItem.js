@@ -9,24 +9,33 @@ import {ChangeDate} from '../redux/actions';
 
 class AddItem extends React.Component {
   
-  date = new Date().getDate();
-  month = new Date().getMonth()+1;
-  year = new Date().getYear()+1900;
-  today = this.month + '-' + this.date + '-' + this.year;
+  state = {
+    myDate: null,
+  }
   
   handleName=(val)=>{
     this.props.dispatch(ChangeName(val))
   }
   
   handleDate=(val)=>{
+    this.setState({
+      myDate:val
+    })
     this.props.dispatch(ChangeDate(val))
   }
+  
+  exp = this.props.showDate;
+  datestr = exp.replace((/-/g, "/")+" 00:00:00 PST");
+  expdate = new Date(datestr);
+  diff = expdate - new Date();
+  dateShowed = Math.ceil(diff/(1000*60*60*24));
   
   handleAdd=()=>{
     var fd = new FormData();
     fd.append("name", this.props.showName);
     fd.append("expiry_date", this.props.showDate);
     fd.append("added_date", this.today);
+    fd.append("days_left", this.dateShowed);
     
     fetch("http://localhost:8888/server_leftover/insert_item.php", {
       method:"POST",
@@ -36,6 +45,7 @@ class AddItem extends React.Component {
     }).then((json)=>{
       //alert(json);
       if(json){
+        console.log(this.exp);
         alert("Item Added");
       }
     });
@@ -48,12 +58,13 @@ class AddItem extends React.Component {
           placeholder="Item Name"
           onChangeText={(val)=>{
             this.handleName(val)}}
-          style={{width:200, height:35, borderBottomWidth:1, borderBottomColor:'#0B0B0B', marginBottom: 35}}>
+          style={{width:200, height:35, borderBottomWidth:1, borderBottomColor:'#0B0B0B', marginBottom: 35, paddingLeft:5}}>
         </TextInput>
         <DatePicker
           onDateChange={(val)=>{
             this.handleDate(val)}}
           style={styles.date}
+          date={this.state.myDate}
           confirmBtnText="Save"
           cancelBtnText="Cancel"
           format="MM-DD-YYYY"
@@ -64,8 +75,9 @@ class AddItem extends React.Component {
               borderTopWidth:0,
               borderLeftWidth:0,
               borderRightWidth:0,
-              paddingRight:125,
-              borderBottomColor:'#0B0B0B'
+              paddingRight:120,
+              borderBottomColor:'#0B0B0B',
+              width:200
             }
           }}
         />

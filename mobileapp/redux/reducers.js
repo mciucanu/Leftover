@@ -7,7 +7,9 @@ const initialStates = {
   email:"",
   username:"",
   password:"",
-  rpassword:""
+  rpassword:"",
+  newExp:"",
+  slname:""
 }
 
 export function ReducerFunc(state=initialStates, action){
@@ -46,6 +48,14 @@ export function ReducerFunc(state=initialStates, action){
       
     case "CHANGE_RPASSWORD":
       obj.rpassword = action.rpassword;
+      return obj;
+      
+    case "UPDATE_EXPIRY":
+      obj.newExp = action.newExp;
+      return obj;
+      
+    case "UPDATE_SLNAME":
+      obj.slname = action.slname;
       return obj;
     
     default:
