@@ -9,6 +9,11 @@ import {ChangeDate} from '../redux/actions';
 
 class AddItem extends React.Component {
   
+  date = new Date().getDate();
+  month = new Date().getMonth()+1;
+  year = new Date().getYear()+1900;
+  today = this.month + '-' + this.date + '-' + this.year;
+  
   state = {
     myDate: null,
   }
@@ -24,18 +29,14 @@ class AddItem extends React.Component {
     this.props.dispatch(ChangeDate(val))
   }
   
-  exp = this.props.showDate;
-  datestr = exp.replace((/-/g, "/")+" 00:00:00 PST");
-  expdate = new Date(datestr);
-  diff = expdate - new Date();
-  dateShowed = Math.ceil(diff/(1000*60*60*24));
+  
   
   handleAdd=()=>{
+    
     var fd = new FormData();
     fd.append("name", this.props.showName);
     fd.append("expiry_date", this.props.showDate);
     fd.append("added_date", this.today);
-    fd.append("days_left", this.dateShowed);
     
     fetch("http://localhost:8888/server_leftover/insert_item.php", {
       method:"POST",
@@ -43,9 +44,7 @@ class AddItem extends React.Component {
     }).then((resp)=>{
       return resp.json();
     }).then((json)=>{
-      //alert(json);
       if(json){
-        console.log(this.exp);
         alert("Item Added");
       }
     });

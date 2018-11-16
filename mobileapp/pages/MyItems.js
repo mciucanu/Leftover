@@ -57,7 +57,6 @@ class MyItems extends React.Component {
   }
   
   handleDelete=(id)=>{
-    console.log(id);
     var fd = new FormData();
     fd.append("id", id);
     
@@ -147,9 +146,9 @@ class MyItems extends React.Component {
       date = new Date().getDate();
       month = new Date().getMonth()+1;
       year = new Date().getYear()+1900;
-      today = this.month + '-' + this.date + '-' + this.year;
-      exp = this.props.showDate;
-      datestr = exp.replace((/-/g, "/")+" 00:00:00 PST");
+      today = month + '-' + date + '-' + year;
+      exp = obj.expiry_date;
+      datestr = exp.replace(/-/g, "/")+" 00:00:00 PST";
       expdate = new Date(datestr);
       diff = expdate - new Date();
       dateShowed = Math.ceil(diff/(1000*60*60*24));
@@ -196,7 +195,7 @@ class MyItems extends React.Component {
             {/*Item Date*/}
             <View style={styles.expireOut}>
               <View style={styles.expireIn}>
-                {this.handleExpired(obj.days_left)}
+                {this.handleExpired(dateShowed)}
               </View>
             </View>
           </View>
