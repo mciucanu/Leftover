@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, ScrollView, Modal, TouchableOpacity } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 import { Dropdown } from 'react-native-material-dropdown';
+import DatePicker from 'react-native-datepicker';
 
 import {connect} from "react-redux";
 
@@ -17,12 +18,6 @@ class MyItems extends React.Component {
         this.setState({
           items:json
         })
-//        var unsorted = this.state.items;
-//        var sorted = unsorted.sort("days_left");
-//        this.setState({
-//          sorted_items: sorted
-//        })
-//        console.log(this.state.sorted_items);
       }
     });
   }
@@ -35,7 +30,10 @@ class MyItems extends React.Component {
     slitem_id:"",
     slitem_name:"",
     slitem_image:"",
-    sort:"Expiry Date"
+    sort:"Expiry Date",
+    modal:false,
+    clickedId:"",
+    newExpDate:"",
   }
   
   handleColor=(val)=>{
@@ -241,6 +239,55 @@ class MyItems extends React.Component {
     }
   }
   
+  handleUpdate=(val)=>{
+    this.setState({
+      modal:true,
+      clickedId:val
+    })
+  }
+  
+  handleClose=()=>{
+    this.setState({
+      modal:false
+    })
+  }
+  
+  handleUpdateDateInp=(val)=>{
+    this.setState({
+      newExpDate:val
+    })
+  }
+  
+  handleUpdateExpBut=()=>{
+    var fd = new FormData();
+    fd.append("item_id", this.state.clickedId);
+    fd.append("expiry_date", this.state.newExpDate);
+    
+    fetch("http://localhost:8888/server_leftover/update_expiry_swipeout.php", {
+      method:"POST",
+      body:fd
+    }).then((resp)=>{
+      return resp.json();
+    }).then((json)=>{
+      if(json){
+        this.setState({
+          modal:false
+        })
+        fetch("http://localhost:8888/server_leftover/show_items.php", {
+          method:"POST"
+        }).then((resp)=>{
+          return resp.json();
+        }).then((json)=>{
+          if(json){
+            this.setState({
+              items:json
+            })
+          }
+        });
+      }
+    });
+  }
+  
   render() {
     
     if(this.state.items.length > 0){
@@ -261,7 +308,12 @@ class MyItems extends React.Component {
       
       var swipeoutBtns = [
         {
-          text: "Add to Shopping List",
+          text: 'Update EXP',
+          backgroundColor: 'lightblue',
+          onPress: this.handleUpdate.bind(this, obj.item_id)  
+        },
+        {
+          text: "Add to SL",
           backgroundColor: '#B8E0CE',
           onPress: this.handleAddToSL.bind(this, obj.item_id)  
         },
@@ -333,6 +385,53 @@ class MyItems extends React.Component {
         <ScrollView>
           {allItems}
         </ScrollView>
+        <Modal
+            visible={this.state.modal}
+            transparent={true}>
+            <View style={styles.modalContainerOut}>
+              <View style={styles.modalContainerIn}>
+                
+                {/*Close Button*/}
+                <TouchableOpacity
+                  onPress={this.handleClose}
+                  style={styles.closeBut}>
+                  <Text style={{color:'lightgrey', fontSize:24, fontWeight:'bold'}}>X</Text>
+                </TouchableOpacity>
+                
+                {/*Heading*/}
+                <Text style={styles.updateDateText}>Update Expiry Date</Text>
+                
+                {/*Date Input*/}
+                <DatePicker
+                  onDateChange={(val)=>{
+                    this.handleUpdateDateInp(val)}}
+                  date={this.state.newExpDate}
+                  style={{width:200}}
+                  confirmBtnText="Save"
+                  cancelBtnText="Cancel"
+                  format="MM-DD-YYYY"
+                  placeholder="Expiry Date"
+                  showIcon={false}
+                  customStyles={{
+                    dateInput: {
+                      borderTopWidth:0,
+                      borderLeftWidth:0,
+                      borderRightWidth:0,
+                      paddingRight:125,
+                      borderBottomColor:'#0B0B0B'
+                    }
+                  }}
+                />
+                
+                {/*Add SL Item Button*/}
+                <TouchableOpacity 
+                  style={styles.updateBut}
+                  onPress={this.handleUpdateExpBut}>
+                  <Text style={styles.butText}>Update</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
       </View>
     );
   }
@@ -388,7 +487,53 @@ const styles = StyleSheet.create({
     marginLeft:30,
     marginRight:30,
     paddingBottom:5
-  }
+  },
+  
+  modalContainerOut: {
+    flex:1,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    width:'100%',
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  
+  modalContainerIn: {
+    backgroundColor: '#fff',
+    alignItems:'center',
+    justifyContent:'center',
+    width:300,
+    height:300,
+    borderWidth:1,
+    borderColor:'lightgrey',
+    borderRadius:40
+  },
+  
+  closeBut: {
+    position:'absolute',
+    right:20,
+    top:20
+  },
+  
+  updateDateText: {
+    fontFamily:'Helvetica',
+    fontSize:18,
+    marginBottom:40
+  },
+  
+  updateBut: {
+    width:150,
+    height:40,
+    backgroundColor:'#B8E0CE',
+    borderRadius:20,
+    alignItems:'center',
+    justifyContent:'center',
+    marginTop:40
+  },
+  
+    butText: {
+    fontFamily: 'Helvetica',
+    color:'#FFFFFF'
+  },
   
 });
 
