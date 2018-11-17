@@ -13,6 +13,7 @@ class AddItem extends React.Component {
   month = new Date().getMonth()+1;
   year = new Date().getYear()+1900;
   today = this.month + '-' + this.date + '-' + this.year;
+  exactTime = new Date();
   
   state = {
     myDate: null,
@@ -29,14 +30,13 @@ class AddItem extends React.Component {
     this.props.dispatch(ChangeDate(val))
   }
   
-  
-  
   handleAdd=()=>{
     
     var fd = new FormData();
     fd.append("name", this.props.showName);
     fd.append("expiry_date", this.props.showDate);
     fd.append("added_date", this.today);
+    fd.append("exact_time", this.exactTime);
     
     fetch("http://localhost:8888/server_leftover/insert_item.php", {
       method:"POST",

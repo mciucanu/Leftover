@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, Image, ScrollView } from 'react-native';
 import Swipeout from 'react-native-swipeout';
+import { Dropdown } from 'react-native-material-dropdown';
 
 import {connect} from "react-redux";
 
@@ -28,12 +29,13 @@ class MyItems extends React.Component {
   
   state = {
     stateExp: this.dateShowed,
-    items: [], 
+    items: [],
     sorted_items: [],
     slitem: [],
     slitem_id:"",
     slitem_name:"",
-    slitem_image:""
+    slitem_image:"",
+    sort:"Expiry Date"
   }
   
   handleColor=(val)=>{
@@ -167,8 +169,83 @@ class MyItems extends React.Component {
     }
   }
   
+  sortByExpire=(items)=>{
+    var newItems = items;
+    
+    newItems.sort((a,b)=>{
+      date = new Date().getDate();
+      month = new Date().getMonth()+1;
+      year = new Date().getYear()+1900;
+      today = month + '-' + date + '-' + year;
+      
+      exp = a.expiry_date;
+      datestr = exp.replace(/-/g, "/")+" 00:00:00 PST";
+      expdate = new Date(datestr);
+      diff = expdate - new Date();
+      dateShowedA = Math.ceil(diff/(1000*60*60*24));
+      
+      exp = b.expiry_date;
+      datestr = exp.replace(/-/g, "/")+" 00:00:00 PST";
+      expdate = new Date(datestr);
+      diff = expdate - new Date();
+      dateShowedB = Math.ceil(diff/(1000*60*60*24));
+      
+      if(dateShowedA < dateShowedB){
+        return -1;
+      }
+      if(dateShowedA > dateShowedB){
+        return 1;
+      }
+      return 0;
+    })
+    return newItems;
+  }
+  
+  sortByName=(items)=>{
+    var newItems = items;
+    
+    newItems.sort((a,b)=>{
+      if(a.name > b.name){
+        return 1;
+      }
+      if(a.name < b.name){
+        return -1;
+      }
+      return 0;
+    })
+    return newItems;
+  }
+  
+  sortByAdded=(items)=>{
+    var newItems = items;
+    
+    newItems.reverse();
+    return newItems;
+  }
+  
+  handleSortDrop=(val)=>{
+    this.setState({
+      sort:val
+    })
+  }
+  
+  handleSort=(val)=>{
+    if(val == "Expiry Date"){
+      return this.sortByExpire(this.state.items)
+    }
+    if(val == "Recently Added"){
+      return this.sortByAdded(this.state.items)
+    }
+    if(val == "Name"){
+      return this.sortByName(this.state.items)
+    }
+  }
+  
   render() {
     
+    if(this.state.items.length > 0){
+      this.state.items = this.handleSort(this.state.sort)
+    }
     
     var allItems = this.state.items.map((obj, i)=>{
     
@@ -231,9 +308,28 @@ class MyItems extends React.Component {
         </Swipeout>
       )
     })
+    
+    let data = [{
+      value: 'Expiry Date',
+    }, {
+      value: 'Recently Added',
+    }, {
+      value: 'Name',
+    }];
+    
     return (
       
       <View style={styles.container}>  
+        <View style={styles.dropDown}>  
+          <Dropdown
+            label='Sort By'
+            data={data}
+            value="Expiry Date"
+            onChangeText={(val)=>{
+              this.handleSortDrop(val)
+            }}
+          />
+        </View>
         <ScrollView>
           {allItems}
         </ScrollView>
@@ -287,6 +383,12 @@ const styles = StyleSheet.create({
     left:30,
     borderRadius:45
   },
+  
+  dropDown: {
+    marginLeft:30,
+    marginRight:30,
+    paddingBottom:5
+  }
   
 });
 
