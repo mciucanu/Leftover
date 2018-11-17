@@ -48,14 +48,6 @@ class MyItems extends React.Component {
     }
   }
   
-  handleDayText=(val)=>{
-    if(val==1){
-      return ("DAY")
-    } else {
-      return ("DAYS")
-    }
-  }
-  
   handleDelete=(id)=>{
     var fd = new FormData();
     fd.append("id", id);
@@ -121,6 +113,43 @@ class MyItems extends React.Component {
     });
   }
   
+  handleMonthYear=(val)=>{
+    if(val <= 30){
+      return(val);
+    }
+    if(val > 30 && val < 365){
+      var myMonth = val / 30;
+      var roundedMonth = Math.floor(myMonth);
+      return(roundedMonth);
+    }
+    if(val >= 365){
+      var myYear = val / 365;
+      var roundedYear = Math.floor(myYear);
+      return(roundedYear);
+    }
+  }
+  
+  handleDayText=(val)=>{
+    if(val==1){
+      return ("DAY")
+    }
+    if(val > 1 && val <= 30){
+      return ("DAYS")
+    }
+    if(val > 30 && val < 60){
+      return ("MONTH")
+    }
+    if(val >= 60 && val < 365){
+      return ("MONTHS")
+    }
+    if(val >= 365 && val < 730){
+      return ("YEAR")
+    }
+    if(val >= 730){
+      return ("YEARS")
+    }
+  }
+  
   handleExpired=(dateShowed)=>{
     if(dateShowed <= 0){
       return (
@@ -131,7 +160,7 @@ class MyItems extends React.Component {
     } else {
       return (
         <View style={{alignItems:'center'}}>
-          <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(dateShowed)}}>{dateShowed}</Text>
+          <Text style={{fontSize:38, fontWeight:"bold", color:this.handleColor(dateShowed)}}>{this.handleMonthYear(dateShowed)}</Text>
           <Text style={{fontSize:16, color:this.handleColor(dateShowed)}}>{this.handleDayText(dateShowed)}</Text>
         </View>
       )
@@ -238,8 +267,8 @@ const styles = StyleSheet.create({
   
   expireOut: {
     flex:1,
-    alignItems:'flex-end',
-    right:30
+    alignItems:'center',
+    right:15
   },
   
   expireIn: {
