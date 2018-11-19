@@ -372,15 +372,17 @@ class MyItems extends React.Component {
     return (
       
       <View style={styles.container}>  
-        <View style={styles.dropDown}>  
-          <Dropdown
-            label='Sort By'
-            data={data}
-            value="Expiry Date"
-            onChangeText={(val)=>{
-              this.handleSortDrop(val)
-            }}
-          />
+        <View style={styles.dropDownBorder}>
+          <View style={styles.dropDown}>  
+            <Dropdown
+              label='Sort By'
+              data={data}
+              value="Expiry Date"
+              onChangeText={(val)=>{
+                this.handleSortDrop(val)
+              }}
+            />
+          </View>
         </View>
         <ScrollView>
           {allItems}
@@ -487,6 +489,12 @@ const styles = StyleSheet.create({
     marginLeft:30,
     marginRight:30,
     paddingBottom:5
+  },
+  
+  dropDownBorder: {
+    width:'100%',
+    borderBottomWidth:1,
+    borderBottomColor:'lightgrey'
   },
   
   modalContainerOut: {
