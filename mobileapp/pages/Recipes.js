@@ -4,6 +4,20 @@ import {connect} from "react-redux";
 
 class Recipes extends React.Component {
 
+  state = {
+    recipes:""
+  }
+  
+  componentWillMount=async ()=>{
+    var resp = await fetch("https://api.edamam.com/search?q=chicken&app_id=2ee30f39&app_key=ab6b5394966b4cdcb18b0d4640575337");
+    console.log(resp);
+    var json = await resp.json();
+    console.log(json);
+    this.setState({
+      recipes:json
+    })
+  }
+  
   render() {
     return (
       <View style={styles.container}>
