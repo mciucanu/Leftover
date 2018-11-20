@@ -19,6 +19,31 @@ class Recipes extends React.Component {
   }
   
   render() {
+    
+    var allRecipes = this.state.recipes.map((obj, index)=>{
+      return (
+        <View 
+          key={index}
+          style={styles.item}>
+          
+          {/*Recipe Image*/}
+          <View style={styles.imgOut}>  
+            <Image 
+              style={styles.itemImg}
+              source={require('../imgs/item1.jpg')}
+              resizeMode='contain'
+            />
+          </View>
+          
+          {/*Item Name*/}
+          <Text 
+            style={styles.name}>
+            {obj.name}
+          </Text>
+        </View>
+      )
+    });
+    
     return (
       <View style={styles.container}>
         <Text>Recipes Page</Text>
@@ -33,6 +58,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  
+  item: {
+    width:'100%',
+    height:130,
+    alignItems:'center',
+    justifyContent:'center',
+    flexDirection:'row',
+    borderBottomColor:'lightgrey',
+    borderBottomWidth:1
+  },
+  
+  imgOut: {
+    overflow:'hidden',
+    width:120,
+    height:90
+  },
+  
+  itemImg: {
+    width:90,
+    flex:1,
+    left:30,
+    borderRadius:45
+  },
+  
+  name: {
+    flex:2,
+    fontSize:20,
+    left:30
   },
   
 });

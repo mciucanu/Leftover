@@ -85,10 +85,11 @@ class MyItems extends React.Component {
     }).then((resp)=>{
       return resp.json();
     }).then((json)=>{
-      if(json==false){
+      console.log(json);
+      if(json.length > 0){
         alert("This item already exists in your Shopping List")
       }
-      if(json!=false){
+      if(json.length <= 0){
         
         var fd1 = new FormData();
         fd1.append("id", id);
@@ -351,7 +352,7 @@ class MyItems extends React.Component {
           autoClose={true}
           >
           <View style={styles.item}>
-            
+          
             {/*Item Image*/}
             <View style={styles.imgOut}>  
               <Image 
