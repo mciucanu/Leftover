@@ -40,6 +40,7 @@ class ShoppingList extends React.Component {
     idPicked: null,
     namePicked: null,
     myDate: null,
+    slId: null
   }
 
   handleDelete=(id)=>{
@@ -69,11 +70,12 @@ class ShoppingList extends React.Component {
     });
   }
   
-  handleAdd=(id, name)=>{
+  handleAdd=(id, name, slId)=>{
     this.setState({
       modal:true,
       idPicked:id,
-      namePicked:name
+      namePicked:name,
+      slId:slId
     })
   }
   
@@ -88,7 +90,7 @@ class ShoppingList extends React.Component {
       return resp.json();
     }).then((json)=>{
       console.log(json);
-      if(json==true){
+      if(json!=true){
         
         var fd = new FormData();
         fd.append("item_id", this.state.idPicked);
@@ -101,6 +103,31 @@ class ShoppingList extends React.Component {
           return resp.json();
         }).then((json)=>{
           if(json){
+            
+            var fd2 = new FormData();
+            fd2.append("id", this.state.slId);
+            
+            fetch("http://localhost:8888/server_leftover/delete_shopping_list.php", {
+              method:"POST",
+              body:fd2
+            }).then((resp)=>{
+              return resp.json();
+            }).then((json)=>{
+              if(json){
+                
+                fetch("http://localhost:8888/server_leftover/show_shopping_list.php", {
+                  method:"POST"
+                }).then((resp)=>{
+                  return resp.json();
+                }).then((json)=>{
+                  if(json){
+                    this.setState({
+                      items:json
+                    })
+                  }
+                });
+              }
+            });
             this.setState({
               modal:false
             }) 
@@ -114,7 +141,6 @@ class ShoppingList extends React.Component {
         fd2.append("name", this.state.namePicked);
         fd2.append("expiry_date", this.props.showNewExp);
         fd2.append("added_date", this.today);
-        fd2.append("days_left", this.dateShowed);
         
         fetch("http://localhost:8888/server_leftover/insert_item.php", {
           method:"POST",
@@ -123,6 +149,31 @@ class ShoppingList extends React.Component {
           return resp.json();
         }).then((json)=>{
           if(json){
+            
+            var fd3 = new FormData();
+            fd3.append("id", this.state.slId);
+            
+            fetch("http://localhost:8888/server_leftover/delete_shopping_list.php", {
+              method:"POST",
+              body:fd3
+            }).then((resp)=>{
+              return resp.json();
+            }).then((json)=>{
+              if(json){
+                
+                fetch("http://localhost:8888/server_leftover/show_shopping_list.php", {
+                  method:"POST"
+                }).then((resp)=>{
+                  return resp.json();
+                }).then((json)=>{
+                  if(json){
+                    this.setState({
+                      items:json
+                    })
+                  }
+                });
+              }
+            });           
             this.setState({
               modal:false
             })
@@ -218,7 +269,7 @@ class ShoppingList extends React.Component {
           <TouchableOpacity
             style={styles.addButton}
             onPress={(val)=>{
-              this.handleAdd(obj.item_id, obj.name)}}>
+              this.handleAdd(obj.item_id, obj.name, obj.slitem_id)}}>
             <Text style={styles.butText}>Bought</Text>
           </TouchableOpacity>
           

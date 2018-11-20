@@ -74,43 +74,60 @@ class MyItems extends React.Component {
     });
   }
   
-  handleAddToSL=(id)=>{
-    var fd = new FormData();
-    fd.append("id", id);
+  handleAddToSL=(id, name)=>{
     
-    fetch("http://localhost:8888/server_leftover/add_to_sl1.php", {
+    var fd = new FormData();
+    fd.append("name", name);
+    
+    fetch("http://localhost:8888/server_leftover/check_slitem.php", {
       method:"POST",
       body:fd
     }).then((resp)=>{
       return resp.json();
     }).then((json)=>{
-      if(json){
-        this.setState({
-          slitem:json
-        })
-        this.setState({
-          slitem_id:this.state.slitem[0].item_id,
-          slitem_name:this.state.slitem[0].name,
-          slitem_image:this.state.slitem[0].image
-        })
+      if(json==false){
+        alert("This item already exists in your Shopping List")
       }
+      if(json!=false){
+        
+        var fd1 = new FormData();
+        fd1.append("id", id);
+        
+        fetch("http://localhost:8888/server_leftover/add_to_sl1.php", {
+          method:"POST",
+          body:fd1
+        }).then((resp)=>{
+          return resp.json();
+        }).then((json)=>{
+          if(json){
+            this.setState({
+              slitem:json
+            })
+            this.setState({
+              slitem_id:this.state.slitem[0].item_id,
+              slitem_name:this.state.slitem[0].name,
+              slitem_image:this.state.slitem[0].image
+            })
+          }
     
-      var fd2 = new FormData();
-      fd2.append("item_id", this.state.slitem_id);
-      fd2.append("name", this.state.slitem_name);
-      fd2.append("image", this.state.slitem_image);
+          var fd2 = new FormData();
+          fd2.append("item_id", this.state.slitem_id);
+          fd2.append("name", this.state.slitem_name);
+          fd2.append("image", this.state.slitem_image);
     
-      fetch("http://localhost:8888/server_leftover/add_to_sl2.php", {
-        method:"POST",
-        body:fd2
-      }).then((resp)=>{
-        return resp.json();
-      }).then((json)=>{
-        if(json){
-          alert("Item Added to Shopping List");
-        }
-      });    
-    });
+          fetch("http://localhost:8888/server_leftover/add_to_sl2.php", {
+            method:"POST",
+            body:fd2
+          }).then((resp)=>{
+            return resp.json();
+          }).then((json)=>{
+            if(json){
+              alert("Item Added to Shopping List");
+            }
+          });    
+        });
+      }
+    })
   }
   
   handleMonthYear=(val)=>{
@@ -315,7 +332,7 @@ class MyItems extends React.Component {
         {
           text: "Add to SL",
           backgroundColor: '#B8E0CE',
-          onPress: this.handleAddToSL.bind(this, obj.item_id)  
+          onPress: this.handleAddToSL.bind(this, obj.item_id, obj.name)  
         },
         {
           text: 'Delete',
