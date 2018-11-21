@@ -38,7 +38,8 @@ class Recipes extends React.Component {
           {/*Item Name*/}
           <Text 
             style={styles.name}>
-            {obj.name}
+            {/*obj.name*/}
+            Title
           </Text>
         </View>
       )
@@ -47,6 +48,7 @@ class Recipes extends React.Component {
     return (
       <View style={styles.container}>
         <Text>Recipes Page</Text>
+        {allRecipes}
       </View>
     );
   }

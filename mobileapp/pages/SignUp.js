@@ -34,7 +34,7 @@ class SignUp extends React.Component {
       fd.append("username", this.props.showUsername);
       fd.append("password", this.props.showPassword);
       
-      fetch("http://localhost:8888/server_leftover/insert_user.php", {
+      fetch("https://leftover-matei.herokuapp.com/insert_user.php", {
         method:"POST",
         body:fd
       }).then((resp)=>{

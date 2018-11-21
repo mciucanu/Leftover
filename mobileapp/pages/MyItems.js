@@ -9,7 +9,7 @@ import {connect} from "react-redux";
 class MyItems extends React.Component {
   
   componentWillMount=()=>{
-    fetch("http://localhost:8888/server_leftover/show_items.php", {
+    fetch("https://leftover-matei.herokuapp.com/show_items.php", {
       method:"POST"
     }).then((resp)=>{
       return resp.json();
@@ -52,14 +52,14 @@ class MyItems extends React.Component {
     var fd = new FormData();
     fd.append("id", id);
     
-    fetch("http://localhost:8888/server_leftover/delete_items.php", {
+    fetch("https://leftover-matei.herokuapp.com/delete_items.php", {
       method:"POST",
       body:fd
     }).then((resp)=>{
       return resp.json();
     }).then((json)=>{
       if(json){
-        fetch("http://localhost:8888/server_leftover/show_items.php", {
+        fetch("https://leftover-matei.herokuapp.com/show_items.php", {
           method:"POST"
         }).then((resp)=>{
           return resp.json();
@@ -79,7 +79,7 @@ class MyItems extends React.Component {
     var fd = new FormData();
     fd.append("name", name);
     
-    fetch("http://localhost:8888/server_leftover/check_slitem.php", {
+    fetch("https://leftover-matei.herokuapp.com/check_slitem.php", {
       method:"POST",
       body:fd
     }).then((resp)=>{
@@ -94,7 +94,7 @@ class MyItems extends React.Component {
         var fd1 = new FormData();
         fd1.append("id", id);
         
-        fetch("http://localhost:8888/server_leftover/add_to_sl1.php", {
+        fetch("https://leftover-matei.herokuapp.com/add_to_sl1.php", {
           method:"POST",
           body:fd1
         }).then((resp)=>{
@@ -116,7 +116,7 @@ class MyItems extends React.Component {
           fd2.append("name", this.state.slitem_name);
           fd2.append("image", this.state.slitem_image);
     
-          fetch("http://localhost:8888/server_leftover/add_to_sl2.php", {
+          fetch("https://leftover-matei.herokuapp.com/add_to_sl2.php", {
             method:"POST",
             body:fd2
           }).then((resp)=>{
@@ -281,7 +281,7 @@ class MyItems extends React.Component {
     fd.append("item_id", this.state.clickedId);
     fd.append("expiry_date", this.state.newExpDate);
     
-    fetch("http://localhost:8888/server_leftover/update_expiry_swipeout.php", {
+    fetch("https://leftover-matei.herokuapp.com/update_expiry_swipeout.php", {
       method:"POST",
       body:fd
     }).then((resp)=>{
@@ -291,7 +291,7 @@ class MyItems extends React.Component {
         this.setState({
           modal:false
         })
-        fetch("http://localhost:8888/server_leftover/show_items.php", {
+        fetch("https://leftover-matei.herokuapp.com/show_items.php", {
           method:"POST"
         }).then((resp)=>{
           return resp.json();

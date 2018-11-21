@@ -23,21 +23,22 @@ class Login extends React.Component {
     })
   }
   
-  handleSignIn=()=>{
+  handleSignIn=async ()=>{
     var fd = new FormData();
     fd.append("username", this.state.username);
     fd.append("password", this.state.password);
     
-      fetch("http://localhost:8888/server_leftover/check_login.php", {
+      fetch("https://leftover-matei.herokuapp.com/check_login.php", {
         method:"POST",
         body:fd
       }).then((resp)=>{
         return resp.json();
       }).then((json)=>{
-        if(json){
-        this.props.dispatch(ChangePage(1));
+        alert(json);
+        if(json.length == 0 || "" || null){
+          alert("Incorrect username/password, please try again");
         } else {
-          alert("Incorrect username/password, please try again")
+          this.props.dispatch(ChangePage(1));
         }
       });
   }

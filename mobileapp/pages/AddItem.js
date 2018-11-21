@@ -38,7 +38,7 @@ class AddItem extends React.Component {
     fd.append("added_date", this.today);
     fd.append("exact_time", this.exactTime);
     
-    fetch("http://localhost:8888/server_leftover/insert_item.php", {
+    fetch("https://leftover-matei.herokuapp.com/insert_item.php", {
       method:"POST",
       body:fd
     }).then((resp)=>{
